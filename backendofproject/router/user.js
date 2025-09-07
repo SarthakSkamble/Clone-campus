@@ -5,8 +5,9 @@ const jwt=require("jsonwebtoken")
 const argon2 = require("argon2");
 const {User,Food_item_list,Order}=require("../db");
 const { default: mongoose } = require("mongoose");
+const cartrouter=require("./cart")
 require("dotenv").config()
-
+router.use("/cart",cartrouter)
 const userSchema = zod.object({
   name: zod.string().min(2, "Name must be at least 2 characters"),
   username: zod.string().min(3, "Username must be at least 3 characters"),
@@ -85,5 +86,27 @@ router.post("/signin",async (req,res)=>
   }
 
 })
+router.get("/search", async (req, res) => {
+  const filter = req.query.filter || "";
+
+  const items = await Food_item_list.find({
+    $or: [
+      { category: { $regex: filter, $options: "i" } },
+      { subCategory: { $regex: filter, $options: "i" } },
+      { itemName: { $regex: filter, $options: "i" } }
+    ]
+  });
+
+  res.json({
+    results: items.map(item => ({
+      itemName: item.itemName,
+      category: item.category,
+      subCategory: item.subCategory,
+      prices: item.prices,
+      _id: item._id
+    }))
+  });
+});
+
 
 module.exports=router

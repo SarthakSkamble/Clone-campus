@@ -55,7 +55,7 @@ const menuSchema = new mongoose.Schema({
   prices: [Number]        // Multiple prices if applicable
 });
 
-const Food_item_list = mongoose.model("MenuItem", menuSchema);
+const Food_item_list = mongoose.model("Food_item_list", menuSchema);
 
 const orderSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -81,9 +81,23 @@ const admin= new mongoose.Schema({
 
 
 })
+const cartSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  items: [
+    {
+      food: { type: mongoose.Schema.Types.ObjectId, ref: "Food_item_list", required: true },
+      quantity: { type: Number, default: 1 },
+      half_or_full:{type:String}
+    }
+  ],
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const Cart = mongoose.model("Cart", cartSchema);
+
 
 const User = mongoose.model("User", userSchema);
 
 const Order = mongoose.model("Order", orderSchema);
 const Admin= mongoose.model("Admin",admin)
-module.exports={User,Food_item_list,Order,Admin}
+module.exports={User,Food_item_list,Order,Admin,Cart}
